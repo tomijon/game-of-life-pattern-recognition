@@ -30,7 +30,7 @@ int main() {
 		world.update();
 		x++;
 
-		if (x % 1000 == 0) cout << x << endl;
+		if (x % 10000 == 0) cout << x << endl;
 		//string output = world.toString(); 
 		//std::system("cls");
 		//std::cout << output;

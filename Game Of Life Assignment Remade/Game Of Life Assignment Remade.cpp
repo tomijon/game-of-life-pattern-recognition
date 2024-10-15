@@ -16,24 +16,26 @@ int main() {
 	world.setAliveCell({ 5, 6 });
 	world.setAliveCell({ 5, 7 });
 
-	for (int i = 0; i < 100; i++) {
-		int x = (rand() % 30);
-		int y = (rand() % 30);
+	for (int i = 0; i < 5000; i++) {
+		int x = (rand() % 100);
+		int y = (rand() % 50);
 		world.setAliveCell({ x, y });
 	}
 
 	world.createNeighbors();
 	
-	int x = 0;
 
 	while (true) {
 		world.update();
-		x++;
 
-		if (x % 10000 == 0) cout << x << endl;
-		//string output = world.toString(); 
-		//std::system("cls");
-		//std::cout << output;
+		string x;
+
+		//if (x % 1000 == 0) cout << x << endl;
+		string output = world.toString(); 
+		std::system("cls");
+		std::cout << output;
+		//getline(cin, x);
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 
 

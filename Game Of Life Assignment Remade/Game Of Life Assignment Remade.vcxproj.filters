@@ -21,6 +21,9 @@
     <ClCompile Include="console.hpp">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="pattern.hpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cell.hpp">

@@ -4,6 +4,8 @@
 #include <unordered_set>
 #include <vector>
 #include <iostream>
+#include <string>
+
 
 using namespace std;
 
@@ -70,6 +72,10 @@ namespace GameOfLife {
 		inline int getRegion() { return regionID; }
 		inline bool hasRegion() { return regionID != -1; }
 
+		inline void setSection(int section) { sectionID = section; }
+		inline int getSection() { return sectionID; }
+		inline bool hasSection() { return sectionID != -1; }
+
 		inline void setState(CellState newState) { state = newState; }
 		inline bool isAlive() { return state == ALIVE; }
 		inline bool isDead() { return state == DEAD; }
@@ -99,6 +105,7 @@ namespace GameOfLife {
 		Point location;
 		Cell* neighbors[8];
 		int regionID;
+		int sectionID;
 		CellState state;
 
 		inline void init(CellState newState) {
@@ -137,10 +144,10 @@ namespace GameOfLife {
 					}
 
 					Cell* cell = cells[{x, y}];
-					//cout << cell->getRegion();
+					//if (cell->isAlive()) output += to_string(cell->getRegion());
+					//else output += " ";
 					if (cell->isAlive()) output += "O";
 					else output += " ";
-
 
 					//else if (cell->isDead()) cout << ".";
 					//else cout << "I";
@@ -150,12 +157,31 @@ namespace GameOfLife {
 			return output;
 		}
 
-		void assignRegions() {
-			int region = 0;
+		void assignSections() {
+			int section = 0;
 			
 			for (pair<Point, Cell*> cell : cells) {
-				if (not cell.second->hasRegion()) {
-					cell.second->setRegion(region);
+				if (not cell.second->hasSection()) {
+					fillSection(cell.second, section);
+					section++;
+				}
+			}
+		}
+
+		void fillSection(Cell* cell, int section) {
+			cell->setSection(section);
+			for (int n = 0; n < NEIGHBORS; n++) {
+				if (cell->getNeighbor(n) and not cell->getNeighbor(n)->hasSection()) {
+					fillSection(cell->getNeighbor(n), section);
+				}
+			}
+		}
+	
+		void assignRegions() {
+			int region = 0;
+
+			for (pair<Point, Cell*> cell : cells) {
+				if (cell.second->isAlive() and not cell.second->hasRegion()) {
 					fillRegion(cell.second, region);
 					region++;
 				}
@@ -163,48 +189,60 @@ namespace GameOfLife {
 		}
 
 		void fillRegion(Cell* cell, int region) {
+			cell->setRegion(region);
+
 			for (int n = 0; n < NEIGHBORS; n++) {
-				if (cell->getNeighbor(n) and not cell->getNeighbor(n)->hasRegion()) {
-					cell->getNeighbor(n)->setRegion(region);
+				if (cell->getNeighbor(n) == nullptr) continue;
+				if (cell->getNeighbor(n)->hasRegion()) continue;
+
+				if (cell->isAlive() and cell->getNeighbor(n)->isAlive()) {
 					fillRegion(cell->getNeighbor(n), region);
 				}
 			}
 		}
+
+
 
 		void update() {
 			unordered_set<Point, PointHash> newAliveLocations;
 
 			for (auto map : cells) {
 				Cell* cell = map.second;
-
+				
 				if (not cell->isValid()) continue;
 
 				int alive = 0;
 				for (int n = 0; n < NEIGHBORS; n++) {
+					if (cell->getNeighbor(n) == nullptr) continue;
 					if (cell->getNeighbor(n)->isAlive()) alive++;
 				}
 				if (alive == 3) newAliveLocations.insert(cell->getPosition());
 				else if (alive == 2 and cell->isAlive()) newAliveLocations.insert(cell->getPosition());
 			}
-
-			for (auto cell : cells) {
-				delete cell.second;
-			}
-			cells.clear();
-
+			clearCells();
+			
 			for (Point p : newAliveLocations) {
 				setAliveCell(p);
 			}
 			createNeighbors();
+			assignSections();
+			assignRegions();
 		}
 
 	private:
 		unordered_map<Point, Cell*, PointHash> cells;
 
-		int lowX = 0;		
-		int highX = 30;		
-		int lowY = 0;
-		int highY = 30;
+		int lowX = -10;		
+		int highX = 100;
+		int lowY = -5;
+		int highY = 55;
+
+		void clearCells() {
+			for (auto cell : cells) {
+				delete cell.second;
+			}
+			cells.clear();
+		}
 
 		void assignActiveNeighbors() {
 			vector<Cell*> aliveCells;
@@ -217,28 +255,20 @@ namespace GameOfLife {
 				for (int n = 0; n < NEIGHBORS; n++) {
 					Point newPos = alive->getPosition() + neighborVectors[n];
 
-					if (not cellExists(newPos)) {
-						setDeadCell(newPos);
-					}
+					if (not cellExists(newPos)) setDeadCell(newPos);
 					alive->setNeighbor(n, cells[newPos]);
 				}
 			}
 		}
 
 		void assignDeadNeighbors() {
-			vector<Cell*> deadCells;
-
 			for (pair<Point, Cell*> cell : cells) {
-				if (cell.second->isDead()) deadCells.push_back(cell.second);
-			}
-
-			for (Cell* dead : deadCells) {
-				for (int n = 0; n < NEIGHBORS; n++) {
-					Point newPos = dead->getPosition() + neighborVectors[n];
-					if (not cellExists(newPos)) {
-						setInvalidCell(newPos);
+				if (cell.second->isDead()) {
+					for (int n = 0; n < NEIGHBORS; n++) {
+						Point newPos = cell.second->getPosition() + neighborVectors[n];
+						if (not cellExists(newPos)) cell.second->setNeighbor(n, nullptr);
+						else cell.second->setNeighbor(n, cells[newPos]);
 					}
-					dead->setNeighbor(n, cells[newPos]);
 				}
 			}
 		}

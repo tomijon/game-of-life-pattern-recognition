@@ -1,3 +1,10 @@
+#pragma once
+
+#include <iostream>
+#include <string>
+#include <unordered_map>
+
+using namespace std;
 //#pragma once
 //
 //#include <iostream>

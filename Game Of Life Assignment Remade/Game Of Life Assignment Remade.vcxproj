@@ -127,8 +127,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cell.cpp" />
     <ClCompile Include="console.hpp" />
     <ClCompile Include="Game Of Life Assignment Remade.cpp" />
+    <ClCompile Include="pattern.cpp" />
     <ClCompile Include="pattern.hpp" />
   </ItemGroup>
   <ItemGroup>

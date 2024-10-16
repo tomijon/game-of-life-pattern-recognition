@@ -1,11 +1,13 @@
 #pragma once
 
+#include <queue>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 #include <iostream>
 #include <string>
 
+#include "pattern.hpp"
 
 using namespace std;
 
@@ -77,6 +79,7 @@ namespace GameOfLife {
 		inline bool hasSection() { return sectionID != -1; }
 
 		inline void setState(CellState newState) { state = newState; }
+		inline CellState getState() { return state; }
 		inline bool isAlive() { return state == ALIVE; }
 		inline bool isDead() { return state == DEAD; }
 		inline bool isValid() { return state != INVALID; }
@@ -127,6 +130,8 @@ namespace GameOfLife {
 		void setDeadCell(Point location) { cells[location] = new Cell(location, DEAD); }
 		void setInvalidCell(Point location) { cells[location] = new Cell(location, INVALID); }
 		bool cellExists(Point location) { return cells.find(location) != cells.end(); }
+		void setSearchingPattern(Patterns::Pattern pattern) { target = pattern; }
+		int getGen() { return gen; }
 
 		void createNeighbors() {
 			assignActiveNeighbors();
@@ -144,10 +149,10 @@ namespace GameOfLife {
 					}
 
 					Cell* cell = cells[{x, y}];
-					//if (cell->isAlive()) output += to_string(cell->getRegion());
-					//else output += " ";
-					if (cell->isAlive()) output += "O";
+					if (cell->isAlive()) output += to_string(cell->getRegion());
 					else output += " ";
+					//if (cell->isAlive()) output += "O";
+					//else output += " ";
 
 					//else if (cell->isDead()) cout << ".";
 					//else cout << "I";
@@ -188,6 +193,9 @@ namespace GameOfLife {
 			}
 		}
 
+		void addToHistory();
+		vector<Patterns::Region> makeRegions();
+
 		void fillRegion(Cell* cell, int region) {
 			cell->setRegion(region);
 
@@ -201,41 +209,22 @@ namespace GameOfLife {
 			}
 		}
 
+		void update();
 
+		bool found() { return match; }
 
-		void update() {
-			unordered_set<Point, PointHash> newAliveLocations;
-
-			for (auto map : cells) {
-				Cell* cell = map.second;
-				
-				if (not cell->isValid()) continue;
-
-				int alive = 0;
-				for (int n = 0; n < NEIGHBORS; n++) {
-					if (cell->getNeighbor(n) == nullptr) continue;
-					if (cell->getNeighbor(n)->isAlive()) alive++;
-				}
-				if (alive == 3) newAliveLocations.insert(cell->getPosition());
-				else if (alive == 2 and cell->isAlive()) newAliveLocations.insert(cell->getPosition());
-			}
-			clearCells();
-			
-			for (Point p : newAliveLocations) {
-				setAliveCell(p);
-			}
-			createNeighbors();
-			assignSections();
-			assignRegions();
-		}
-
+		int gen = -1;
 	private:
 		unordered_map<Point, Cell*, PointHash> cells;
+		priority_queue<Patterns::History> history;
 
-		int lowX = -10;		
-		int highX = 100;
-		int lowY = -5;
-		int highY = 55;
+		int lowX = 0;		
+		int highX = 20;
+		int lowY = 0;
+		int highY = 20;
+		int match = false;
+
+		Patterns::Pattern target;
 
 		void clearCells() {
 			for (auto cell : cells) {
@@ -272,5 +261,8 @@ namespace GameOfLife {
 				}
 			}
 		}
+
+		void checkHistory(vector<Patterns::Region> regions);
+
 	};
 }

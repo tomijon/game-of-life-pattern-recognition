@@ -3,93 +3,101 @@
 #include <queue>
 #include <string>
 #include <functional>
-#include <unordered_map>
+#include <unordered_set>
 
 using namespace std;
 
 namespace Patterns {
 
-	struct Edge {
-		int x1;
-		int y1;
-		int x2;
-		int y2;
+	struct Node {
+		int x;
+		int y;
 
-		bool operator>(const Edge& other) const {
-			if (x1 > other.x1) return true;
-			if (y1 > other.y1) return true;
-			if (x2 > other.x2) return true;
-			if (y2 > other.y2) return true;
-			return false;
-		}
-
-		string toString() {
-			return "(" + to_string(x1) + "," + to_string(y1) + "->" + to_string(x2) + "," + to_string(y2) + ")";
-		}
-	};
-
-	struct CompareEdges {
-		bool operator()(const Edge& first, const Edge& second) { return first > second; }
+		bool operator==(const Node& other) const { return x == other.x and y == other.y; }
 	};
 
 
-	const unordered_map<Pattern, Pattern, PatternHash> patterns;
-	
+	struct NodeHash {
+		size_t operator()(const Node& node) const {
+			return (static_cast<size_t>(node.x) << 32) ^ static_cast<size_t>(node.y);
+		}
+	};
 
 
-	class Pattern {
+	class Region {
 	public:
-		void addEdge(Edge edge) { 
-			if (edge.x1 < minX) {
-				minX = edge.x1;
-				minY = edge.y1;
-			}
+		Region() : minX(INT32_MAX), minY(INT32_MAX) {}
 
-			if (edge.x1 == minX and edge.y1 < minY) {
-				minY = edge.y1;
-			}
+		void addCell(int x, int y) {
+			nodes.insert({ x, y });
 
-			edges.push_back(edge);
+			if (x < minX) {
+				minX = x;
+				minY = y;
+			}
+			else if (x == minX and y < minY) {
+				minY = y;
+			}
 		}
 
-		string toString() const {
-			priority_queue<Edge> sorted;
-			string result = "";
+		unordered_set<Node, NodeHash> generateShape() const;
 
-			for (Edge edge : edges) {
-				Edge copy = { edge.x1 - minX, edge.y1 - minY, edge.x2 - minX, edge.y2 - minY };
-				sorted.push(copy);
-			}
-
-			while (not sorted.empty()) {
-				Edge current = sorted.top();
-				sorted.pop();
-				result += current.toString();
-			}
-			return result;
+		pair<int, int> getSpacialDifference(const Region& other) const {
+			return { minX - other.minX, minY - other.minY };
+		}
+		
+		bool operator==(const Region& other) const {
+			return generateShape() == other.generateShape();
 		}
 
-		bool shapeMatches(const Pattern& other) const {
-			return toString() == other.toString();
+		int getMinX() { return minX; }
+		int getMinY() { return minY; }
+
+	protected:
+		unordered_set<Node, NodeHash> nodes;
+		int minX;
+		int minY;
+	};
+
+
+	class Pattern : public Region {
+	public:
+		Pattern() : Region(), period(0), xOffset(0), yOffset(0) {}
+
+		void setPeriod(int period) { this->period = period; }
+		int getPeriod() { return period; }
+
+		void setOffset(int x, int y) {
+			xOffset = x;
+			yOffset = y;
 		}
 
-		bool positionMatches(const Pattern& other) const {
-			return minX == other.minX and minY == other.minY;
-		}
+		int getXOffset() { return xOffset; }
+		int getYOffset() { return yOffset; }
 
 	private:
-		int minX = INT32_MAX;
-		int minY = INT32_MAX;
-		vector<Edge> edges;
+		int period;
+		int xOffset;
+		int yOffset;
 	};
 
 
-	struct PatternHash {
-		size_t operator()(const Pattern& other) const {
-			hash<string> function;
-			return function(other.toString());
+	struct History {
+		History(Region shape, int next) : shape(shape), nextAppearance(next) {}
+
+		History(const History& other) : shape(other.shape), nextAppearance(other.nextAppearance) {}
+
+		Region shape;
+		int nextAppearance;
+
+		bool operator<(const History& other) const {
+			return nextAppearance > other.nextAppearance;
 		}
+
+		void operator=(const History& other) {
+			shape = other.shape;
+			nextAppearance = other.nextAppearance;
+		}
+
 	};
-
-
 }

@@ -26,7 +26,7 @@ namespace Patterns {
 
 	class Region {
 	public:
-		Region() : minX(INT32_MAX), minY(INT32_MAX), size(0) {}
+		Region() {}
 		Region(const Region& other) : minX(other.minX), minY(other.minY), nodes(other.nodes), size(other.size) {}
 		Region(Region&& other) noexcept : minX(other.minX), minY(other.minY), nodes(other.nodes), size(other.size) {}
 
@@ -63,11 +63,11 @@ namespace Patterns {
 		int getMinX() { return minX; }
 		int getMinY() { return minY; }
 
-		int size;
+		int size = 0;
 	protected:
 		unordered_set<Node, NodeHash> nodes;
-		int minX;
-		int minY;
+		int minX = INT32_MAX;
+		int minY = INT32_MAX;
 	};
 
 
@@ -75,6 +75,12 @@ namespace Patterns {
 	public:
 		Pattern() : Region(), period(0), xOffset(0), yOffset(0) {}
 		Pattern(const Pattern& other) : period(other.period), xOffset(other.xOffset), yOffset(other.yOffset) {
+			minX = other.minX;
+			minY = other.minY;
+			size = other.size;
+			nodes = other.nodes;
+		}
+		Pattern(Pattern&& other) noexcept : period(other.period), xOffset(other.xOffset), yOffset(other.yOffset) {
 			minX = other.minX;
 			minY = other.minY;
 			size = other.size;
@@ -92,7 +98,7 @@ namespace Patterns {
 		int getXOffset() { return xOffset; }
 		int getYOffset() { return yOffset; }
 
-		void operator=(const Pattern& other) {
+		Pattern& operator=(const Pattern& other) {
 			period = other.period;
 			xOffset = other.xOffset;
 			yOffset = other.yOffset;
@@ -100,6 +106,18 @@ namespace Patterns {
 			minX = other.minX;
 			minY = other.minY;
 			size = other.size;
+			return *this;
+		}
+
+		Pattern& operator=(Pattern&& other) noexcept {
+			period = other.period;
+			xOffset = other.xOffset;
+			yOffset = other.yOffset;
+			nodes = other.nodes;
+			minX = other.minX;
+			minY = other.minY;
+			size = other.size;
+			return *this;
 		}
 
 	private:
@@ -147,9 +165,15 @@ namespace Patterns {
 		}
 		~Target() { if (targets != nullptr) delete[] targets; }
 
-		int getXOffset() { return targets[0].getXOffset(); }
-		int getYOffset() { return targets[0].getYOffset(); }
+		int getXOffset(Region region) { return findMatch(region).getXOffset(); }
+		int getYOffset(Region region) { return findMatch(region).getYOffset(); }
 		int getPeriod() { return targets[0].getPeriod(); }
+		Pattern findMatch(Region region) {
+			for (int i = 0; i < amount; i++) {
+				if (region == targets[i]) return targets[i];
+			}
+			return targets[0];
+		}
 
 		bool operator==(const Region& other) const {
 			for (int i = 0; i < amount; i++) {

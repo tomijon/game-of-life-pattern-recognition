@@ -16,25 +16,26 @@ namespace GameOfLife {
 
 	const int NEIGHBORS = 8;
 
+	template <typename T>
 	struct Point {
 		Point() : x(0), y(0) {}
 		Point(int x, int y) : x(x), y(y) {}
 		Point(const Point& other) : x(other.x), y(other.y) {}
 
-		int x;
-		int y;
+		T x;
+		T y;
 
-		bool operator==(const Point& other) const { return x == other.x and y == other.y; }
-		Point operator+(const Point& other) const { return { x + other.x, y + other.y }; }
+		bool operator==(const Point<T>& other) const { return x == other.x and y == other.y; }
+		Point<T> operator+(const Point<T>& other) const { return { x + other.x, y + other.y }; }
 	};
 
-
+	
 	struct PointHash {
-		size_t operator()(const Point& point) const { return (static_cast<size_t>(point.x) << 32) ^ static_cast<size_t>(point.y); }
+		size_t operator()(const Point<int>& point) const { return (static_cast<size_t>(point.x) << 32) ^ static_cast<size_t>(point.y); }
 	};
 
 
-	const Point neighborVectors[8] =
+	const Point<int> neighborVectors[8] =
 	{
 		{-1, -1}, {0, -1}, {1, -1}, 
 		{-1, 0}, {1, 0},			
@@ -52,7 +53,7 @@ namespace GameOfLife {
 	class Cell {
 	public:
 		Cell() { init(INVALID); }
-		Cell(Point p, CellState newState) : location(p), state(newState), regionID(-1), sectionID(-1) {
+		Cell(Point<int> p, CellState newState) : location(p), state(newState), regionID(-1), sectionID(-1) {
 			for (int n = 0; n < NEIGHBORS; n++) {
 				setNeighbor(n, nullptr);
 			}
@@ -85,7 +86,7 @@ namespace GameOfLife {
 		inline bool isDead() { return state == DEAD; }
 		inline bool isValid() { return state != INVALID; }
 		
-		inline Point getPosition() { return location; }
+		inline Point<int> getPosition() { return location; }
 
 		void operator=(const Cell& other) noexcept {
 			location = other.location;
@@ -106,7 +107,7 @@ namespace GameOfLife {
 		}
 
 	private:
-		Point location;
+		Point<int> location;
 		Cell* neighbors[8];
 		int regionID;
 		int sectionID;
@@ -132,13 +133,14 @@ namespace GameOfLife {
 		void setYRange(int low, int high) { lowY = low; highY = high; }
 		void setInitial(int amount) { initialActive = amount; }
 
-		inline void setAliveCell(Point location) { cells[location] = new Cell(location, ALIVE); }
-		inline void setDeadCell(Point location) { cells[location] = new Cell(location, DEAD); }
-		inline void setInvalidCell(Point location) { cells[location] = new Cell(location, INVALID); }
-		inline bool cellExists(Point location) { return cells.find(location) != cells.end(); }
+		inline void setAliveCell(Point<int> location) { cells[location] = new Cell(location, ALIVE); }
+		inline void setDeadCell(Point<int> location) { cells[location] = new Cell(location, DEAD); }
+		inline void setInvalidCell(Point<int> location) { cells[location] = new Cell(location, INVALID); }
+		inline bool cellExists(Point<int> location) { return cells.find(location) != cells.end(); }
 		inline void searchFor(Base::BasePattern pattern) { target = Base::getPatterns(pattern); }
 		inline int getWidth() { return highX - lowX; }
 		inline int getHeight() { return highY - lowY; }
+		inline int getSeed() { return seed; }
 
 		void generate() {
 			srand(seed);
@@ -156,7 +158,7 @@ namespace GameOfLife {
 			auto reg = makeRegions();
 			addToHistory(reg);
 			addToHistory(makeSections());
-			gen++;
+			gen = 0;
 		}
 		inline void setSeed(int seed) { this->seed = seed; }
 		inline void setTargetGeneration(int target) { targetGeneration = target; }
@@ -197,7 +199,7 @@ namespace GameOfLife {
 		void assignSections() {
 			int section = 0;
 			
-			for (pair<Point, Cell*> cell : cells) {
+			for (pair<Point<int>, Cell*> cell : cells) {
 				if (not cell.second->hasSection()) {
 					fillSection(cell.second, section);
 					section++;
@@ -219,7 +221,7 @@ namespace GameOfLife {
 		void assignRegions() {
 			int region = 0;
 
-			for (pair<Point, Cell*> cell : cells) {
+			for (pair<Point<int>, Cell*> cell : cells) {
 				if (cell.second->isAlive() and not cell.second->hasRegion()) {
 					fillRegion(cell.second, region);
 					region++;
@@ -245,6 +247,12 @@ namespace GameOfLife {
 			}
 		}
 
+		void clearCells() {
+			for (auto cell : cells) {
+				delete cell.second;
+			}
+			cells.clear();
+		}
 
 		void save(const string filename) const;
 		void load(const string filename);
@@ -255,7 +263,7 @@ namespace GameOfLife {
 
 		int gen = -1;
 	private:
-		unordered_map<Point, Cell*, PointHash> cells;
+		unordered_map<Point<int>, Cell*, PointHash> cells;
 		priority_queue<Patterns::History> history;
 
 		int initialActive = 0;
@@ -269,23 +277,17 @@ namespace GameOfLife {
 
 		Patterns::Target target;
 
-		void clearCells() {
-			for (auto cell : cells) {
-				delete cell.second;
-			}
-			cells.clear();
-		}
-
+		
 		void assignActiveNeighbors() {
 			vector<Cell*> aliveCells;
 
-			for (pair<Point, Cell*> cell : cells) {
+			for (pair<Point<int>, Cell*> cell : cells) {
 				if (cell.second->isAlive()) aliveCells.push_back(cell.second);
 			}
 
 			for (Cell* alive : aliveCells) {
 				for (int n = 0; n < NEIGHBORS; n++) {
-					Point newPos = alive->getPosition() + neighborVectors[n];
+					Point<int> newPos = alive->getPosition() + neighborVectors[n];
 
 					if (not cellExists(newPos)) setDeadCell(newPos);
 					alive->setNeighbor(n, cells[newPos]);
@@ -294,10 +296,10 @@ namespace GameOfLife {
 		}
 
 		void assignDeadNeighbors() {
-			for (pair<Point, Cell*> cell : cells) {
+			for (pair<Point<int>, Cell*> cell : cells) {
 				if (cell.second->isDead()) {
 					for (int n = 0; n < NEIGHBORS; n++) {
-						Point newPos = cell.second->getPosition() + neighborVectors[n];
+						Point<int> newPos = cell.second->getPosition() + neighborVectors[n];
 						if (not cellExists(newPos)) cell.second->setNeighbor(n, nullptr);
 						else cell.second->setNeighbor(n, cells[newPos]);
 					}

@@ -24,6 +24,7 @@ namespace Base {
 	};
 
 
+	Target nonePattern();
 	Target blockPattern();
 	Target beehivePattern();
 	Target blinkerPattern();
@@ -31,12 +32,5 @@ namespace Base {
 	Target gliderPattern();
 	Target lwssPattern();
 
-
-
-
-
-
 	Patterns::Target getPatterns(BasePattern pattern);
-
-	
 }

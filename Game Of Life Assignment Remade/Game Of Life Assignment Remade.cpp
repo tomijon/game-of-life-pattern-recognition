@@ -86,44 +86,8 @@ string getFileName() {
 
 
 int main() {
-	///*Pattern block = Pattern();
-
-	//block.addCell(0, 0);
-	//block.addCell(1, 0);
-	//block.addCell(0, 1);
-	//block.addCell(1, 1);
-	//block.setOffset(0, 0);
-	//block.setPeriod(1);*/
-
-	//Pattern beehive = Pattern();
-	//beehive.addCell(1, 0);
-	//beehive.addCell(2, 0);
-	//beehive.addCell(0, 1);
-	//beehive.addCell(3, 1);
-	//beehive.addCell(1, 2);
-	//beehive.addCell(2, 2);
-	//beehive.setPeriod(1);
-
-	//Pattern glider = Pattern();
-	//glider.addCell(0, 0);
-	//glider.addCell(1, 1);
-	//glider.addCell(2, 1);
-	//glider.addCell(0, 2);
-	//glider.addCell(1, 2);
-	//glider.setPeriod(4);
-	//glider.setOffset(-1, -1);
-
-	//Pattern toad = Pattern();
-	//toad.addCell(1, 0);
-	//toad.addCell(0, 1);
-	//toad.addCell(0, 2);
-	//toad.addCell(3, 1);
-	//toad.addCell(3, 2);
-	//toad.addCell(2, 3);
-	//toad.setPeriod(2);
-	//toad.setOffset(0, 0);
-
 	World world;
+	string cont = "no";
 
 	cout << "Would you like to load a previous save?" << endl;
 	string load = getYesNo();
@@ -142,8 +106,6 @@ int main() {
 	setTargetGeneration(world);
 	setSeed(world);
 	setPattern(world);
-
-	int seed = world.getSee
 
 execute:
 	world.generate();
@@ -164,12 +126,17 @@ execute:
 	}
 
 	while (not world.found()) {
-		world.setSeed(rand());
-		
+		if (load == "no") {
+			world.setSeed(world.getSeed() + 1);
+			world.clearCells();
+			world.generate();
+		}
+
 		while (not world.found() and world.getGen() < world.getTargetGeneration()) {
+extend:
 			if (autoPlay == "no" and watching == "yes") {
 				string x;
-				cout << "Press 'Enter' to step forward.";
+				std::cout << "Press 'Enter' to step forward.";
 				getline(cin, x);
 			}
 			else if (autoPlay == "yes" and watching == "yes") {
@@ -182,23 +149,38 @@ execute:
 				string output = world.toString();
 				std::system("cls");
 				std::cout << output;
-				cout << "Generation: " << world.getGen() << endl;
+				std::cout << "Generation: " << world.getGen() << endl;
 			}
+
 		}
 	}
 
-	system("cls");
-	std::cout << world.toString();
 
-	if (world.found()) {
-		cout << "PATTERN FOUND AT GENERATION " << world.getGen() << endl;
+	if (cont == "no") {
+		system("cls");
+		std::cout << world.toString();
+
+
+		if (world.found()) {
+			std::cout << "PATTERN FOUND AT GENERATION " << world.getGen() << endl;
+		}
+		else {
+			std::cout << "NO PATTERN FOUND" << endl;
+		}
+
+		std::cout << "Would you like to continue?" << endl;
+		cont = getYesNo();
 	}
-	else {
-		cout << "NO PATTERN FOUND" << endl;
+	if (cont == "yes") {
+		string line;
+		getline(cin, line);
+		while (line != "exit") {
+			goto extend;
+		}
 	}
 
 	if (load == "yes") return 0;
-	cout << "Would you like to save?" << endl;
+	std::cout << "Would you like to save?" << endl;
 	string save = getYesNo();
 	if (save == "yes") world.save(getFileName());
 

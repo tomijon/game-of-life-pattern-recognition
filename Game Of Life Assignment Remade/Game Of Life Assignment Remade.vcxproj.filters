@@ -18,9 +18,6 @@
     <ClCompile Include="Game Of Life Assignment Remade.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="console.hpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="pattern.hpp">
       <Filter>Header Files</Filter>
     </ClCompile>

@@ -371,7 +371,7 @@ Target Base::lwssPattern() {
 	stage1R.addCell(4, 0);
 	stage1R.addCell(4, 1);
 	stage1R.addCell(4, 2);
-	stage1R.setOffset(-1, 0);
+	stage1R.setOffset(-2, 0);
 	stage1R.setPeriod(4);
 
 	Pattern stage2R;
@@ -387,7 +387,7 @@ Target Base::lwssPattern() {
 	stage2R.addCell(3, 2);
 	stage2R.addCell(3, 3);
 	stage2R.addCell(4, 2);
-	stage2R.setOffset(-1, 0);
+	stage2R.setOffset(-2, 0);
 	stage2R.setPeriod(4);
 
 	Pattern stage3R;
@@ -400,7 +400,7 @@ Target Base::lwssPattern() {
 	stage3R.addCell(4, 3);
 	stage3R.addCell(4, 2);
 	stage3R.addCell(4, 1);
-	stage3R.setOffset(-1, 0);
+	stage3R.setOffset(-2, 0);
 	stage3R.setPeriod(4);
 
 	Pattern stage4R;
@@ -416,7 +416,7 @@ Target Base::lwssPattern() {
 	stage4R.addCell(3, 1);
 	stage4R.addCell(3, 0);
 	stage4R.addCell(4, 1);
-	stage4R.setOffset(-1, 0);
+	stage4R.setOffset(-2, 0);
 	stage4R.setPeriod(4);
 
 
@@ -430,7 +430,7 @@ Target Base::lwssPattern() {
 	stage1L.addCell(0, 0);
 	stage1L.addCell(0, 1);
 	stage1L.addCell(0, 2);
-	stage1L.setOffset(1, 0);
+	stage1L.setOffset(2, 0);
 	stage1L.setPeriod(4);
 
 	Pattern stage2L;
@@ -446,7 +446,7 @@ Target Base::lwssPattern() {
 	stage2L.addCell(1, 2);
 	stage2L.addCell(1, 3);
 	stage2L.addCell(0, 2);
-	stage2L.setOffset(1, 0);
+	stage2L.setOffset(2, 0);
 	stage2L.setPeriod(4);
 
 	Pattern stage3L;
@@ -459,7 +459,7 @@ Target Base::lwssPattern() {
 	stage3L.addCell(0, 3);
 	stage3L.addCell(0, 2);
 	stage3L.addCell(0, 1);
-	stage3L.setOffset(1, 0);
+	stage3L.setOffset(2, 0);
 	stage3L.setPeriod(4);
 
 	Pattern stage4L;
@@ -475,7 +475,7 @@ Target Base::lwssPattern() {
 	stage4L.addCell(1, 1);
 	stage4L.addCell(1, 0);
 	stage4L.addCell(0, 1);
-	stage4L.setOffset(1, 0);
+	stage4L.setOffset(2, 0);
 	stage4L.setPeriod(4);
 
 	Pattern stage1U;
@@ -488,7 +488,7 @@ Target Base::lwssPattern() {
 	stage1U.addCell(2, 0);
 	stage1U.addCell(3, 1);
 	stage1U.addCell(3, 4);
-	stage1U.setOffset(0, 1);
+	stage1U.setOffset(0, 2);
 	stage1U.setPeriod(4);
 
 	Pattern stage2U;
@@ -504,7 +504,7 @@ Target Base::lwssPattern() {
 	stage2U.addCell(2, 4);
 	stage2U.addCell(3, 1);
 	stage2U.addCell(3, 2);
-	stage2U.setOffset(0, 1);
+	stage2U.setOffset(0, 2);
 	stage2U.setPeriod(4);
 
 	Pattern stage3U;
@@ -517,7 +517,7 @@ Target Base::lwssPattern() {
 	stage3U.addCell(1, 0);
 	stage3U.addCell(0, 1);
 	stage3U.addCell(0, 4);
-	stage3U.setOffset(0, 1);
+	stage3U.setOffset(0, 2);
 	stage3U.setPeriod(4);
 
 	Pattern stage4U;
@@ -533,7 +533,7 @@ Target Base::lwssPattern() {
 	stage4U.addCell(1, 4);
 	stage4U.addCell(0, 1);
 	stage4U.addCell(0, 2);
-	stage4U.setOffset(0, 1);
+	stage4U.setOffset(0, 2);
 	stage4U.setPeriod(4);
 
 	Pattern stage1D;
@@ -546,7 +546,7 @@ Target Base::lwssPattern() {
 	stage1D.addCell(2, 4);
 	stage1D.addCell(3, 3);
 	stage1D.addCell(3, 0);
-	stage1D.setOffset(0, -1);
+	stage1D.setOffset(0, -2);
 	stage1D.setPeriod(4);
 
 	Pattern stage2D;
@@ -562,7 +562,7 @@ Target Base::lwssPattern() {
 	stage2D.addCell(2, 0);
 	stage2D.addCell(3, 3);
 	stage2D.addCell(3, 2);
-	stage2D.setOffset(0, -1);
+	stage2D.setOffset(0, -2);
 	stage2D.setPeriod(4);
 
 	Pattern stage3D;
@@ -575,7 +575,7 @@ Target Base::lwssPattern() {
 	stage3D.addCell(1, 4);
 	stage3D.addCell(0, 3);
 	stage3D.addCell(0, 0);
-	stage3D.setOffset(0, -1);
+	stage3D.setOffset(0, -2);
 	stage3D.setPeriod(4);
 
 	Pattern stage4D;
@@ -591,7 +591,7 @@ Target Base::lwssPattern() {
 	stage4D.addCell(1, 0);
 	stage4D.addCell(0, 3);
 	stage4D.addCell(0, 2);
-	stage4D.setOffset(0, -1);
+	stage4D.setOffset(0, -2);
 	stage4D.setPeriod(4);
 
 

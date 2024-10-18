@@ -86,8 +86,7 @@ void GameOfLife::World::checkHistory(vector<Patterns::Region> Regions) {
 			if (region == check.shape) {
 				if (region.getMinX() < 0 or region.getMinY() < 0 or region.getMinX() > getWidth() - check.shape.size - 1 or region.getMinY() > getHeight() - check.shape.size - 1) continue;
 				pair<int, int> offset = check.shape.getSpacialDifference(region);
-				cout << offset.first << ", " << offset.second;
-				// if (offset.first == target.getXOffset(region) and offset.second == target.getYOffset(region)) match = true;
+				if (offset.first == target.getXOffset(region) and offset.second == target.getYOffset(region)) match = true;
 			}
 		}
 
@@ -104,7 +103,6 @@ void GameOfLife::World::checkHistory(vector<Patterns::Region> Regions) {
 void GameOfLife::World::addToHistory(vector<Patterns::Region> regions) {
 	for (Patterns::Region region : regions) {
 		if (region == target) {
-			cout << "Seed: " << seed << " - Found a Pattern Match on Generation " << gen << endl;
 			Patterns::History seen(region, gen + target.getPeriod());
 			history.push(seen);
 		}

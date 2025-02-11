@@ -234,15 +234,15 @@ extend:
 				getline(cin, x);
 			}
 			else if (autoPlay == "yes" and watching == "yes") {
-				this_thread::sleep_for(chrono::milliseconds(100));
+				//this_thread::sleep_for(chrono::milliseconds(100));
 			}
 
 			world.update();
 
 			if (watching == "yes") {
 				string output = world.toString();
-				std::system("cls");
-				std::cout << output;
+				//std::system("cls");
+				std::cout << "\033[H" << output;
 				std::cout << "Generation: " << world.getGen() << endl;
 			}
 

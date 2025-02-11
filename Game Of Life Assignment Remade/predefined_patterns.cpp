@@ -28,7 +28,7 @@ Target Base::blockPattern() {
 
 	Target combine;
 	combine.targets = new Pattern[1];
-	combine.amount = 0;
+	combine.amount = 1;
 	combine.targets[0] = block;
 	combine.patternID = Base::BasePattern::BLOCK;
 	return combine;

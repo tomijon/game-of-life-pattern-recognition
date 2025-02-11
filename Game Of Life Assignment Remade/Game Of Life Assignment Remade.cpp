@@ -9,9 +9,16 @@ using namespace GameOfLife;
 using namespace Patterns;
 
 
+
+
+int ern(int width, int height, int active) {
+	return width + height + active;
+}
+
+
 void setWidth(World& world) {
 	string width;
-	cout << "Enter world width > ";
+	std::cout << "Enter world width > ";
 	cin >> width;
 	world.setXRange(0, stoi(width));
 }
@@ -19,12 +26,12 @@ void setWidth(World& world) {
 
 void setPattern(World& world) {
 	string patternName;
-	cout << "Enter the name of pattern to search for: " << endl;
-	cout << "Available Names:" << endl;
+	std::cout << "Enter the name of pattern to search for: " << endl;
+	std::cout << "Available Names:" << endl;
 	for (string pattern : Base::names) {
-		cout << "    - " << pattern << endl;
+		std::cout << "    - " << pattern << endl;
 	}
-	cout << " > ";
+	std::cout << " > ";
 	cin >> patternName;
 	for (int i = 0; i < patternName.size(); i++) patternName[i] = tolower(patternName.at(i));
 	for (int i = 0; i < 7; i++) {
@@ -38,7 +45,7 @@ void setPattern(World& world) {
 
 void setHeight(World& world) {
 	string height;
-	cout << "Enter world height > ";
+	std::cout << "Enter world height > ";
 	cin >> height;
 	world.setYRange(0, stoi(height));
 }
@@ -46,7 +53,7 @@ void setHeight(World& world) {
 
 void setInitialAlive(World& world) {
 	string initialCount;
-	cout << "Enter the number of starting alive cells > ";
+	std::cout << "Enter the number of starting alive cells > ";
 	cin >> initialCount;
 	world.setInitial(stoi(initialCount));
 }
@@ -54,7 +61,7 @@ void setInitialAlive(World& world) {
 
 void setTargetGeneration(World& world) {
 	string targetGen;
-	cout << "Enter the maximum generation count > ";
+	std::cout << "Enter the maximum generation count > ";
 	cin >> targetGen;
 	world.setTargetGeneration(stoi(targetGen));
 }
@@ -62,7 +69,7 @@ void setTargetGeneration(World& world) {
 
 void setSeed(World& world) {
 	string seed;
-	cout << "Enter generator seed > ";
+	std::cout << "Enter generator seed > ";
 	cin >> seed;
 	world.setSeed(stoi(seed));
 }
@@ -70,7 +77,7 @@ void setSeed(World& world) {
 
 string getYesNo() {
 	string yesNo;
-	cout << "Yes or No? > ";
+	std::cout << "Yes or No? > ";
 	cin >> yesNo;
 	for (int i = 0; i < yesNo.size(); i++) yesNo[i] = tolower(yesNo.at(i));
 	return yesNo;
@@ -79,17 +86,102 @@ string getYesNo() {
 
 string getFileName() {
 	string name;
-	cout << "Enter file name > ";
+	std::cout << "Enter file name > ";
 	cin >> name;
 	return name;
 }
 
 
+void calculateERN() {
+	Base::BasePattern allTypes[6] = {
+		Base::BasePattern::BLOCK,
+		Base::BasePattern::BEEHIVE,
+		Base::BasePattern::BLINKER,
+		Base::BasePattern::TOAD,
+		Base::BasePattern::GLIDER,
+		Base::BasePattern::LWSS
+	};
+
+	int index = 1;
+	for (Base::BasePattern target : allTypes) {
+		int width = 1;
+		int height = 1;
+		int x = 0;
+		int y = 0;
+		int active = 1;
+		bool found = false;
+		int result = 0;
+
+		while (found == false) {
+			//cout << "width " << width << endl;
+			//cout << "height " << height << endl;
+			//cout << "active " << active << endl;
+			//cout << "found " << found << endl;
+		
+			World world;
+			world.searchFor(target);
+			world.setXRange(0, width);
+			world.setYRange(0, height);
+
+			for (int i = 0; i < active; i++) {
+				x = i % width;
+				y = i / width;
+				//cout << x << ", " << y << endl;
+				world.setAliveCell({ x, y });
+			}
+
+			world.createNeighbors();
+			world.assignRegions();
+			world.assignSections();
+
+			vector<Region> regions = world.makeRegions();
+			vector<Region> sections = world.makeSections();
+			world.addToHistory(regions);
+			world.addToHistory(sections);
+			world.checkHistory(regions);
+			world.checkHistory(sections);
+			for (int i = 0; i < 1000; i++) {
+				world.update();
+			}
+
+			if (world.hasHistory()) {
+				found = true;
+				result = ern(width, height, active);
+				break;
+			}
+
+			active++;
+
+			if (active > width * height) {
+				if (width == height) width++;
+				else height++;
+			}
+
+		}
+
+		std::cout << Base::names[index] << " ern -> " << result << endl;
+		index++;
+
+		
+	}
+}
+
+
 int main() {
 	World world;
+
+	std::cout << "Would you like to calculate ERNs?" << endl;
+	string ern = getYesNo();
+
+	if (ern == "yes") {
+		calculateERN();
+		return 0;
+	}
+	else system("cls");
+
 	string cont = "no";
 
-	cout << "Would you like to load a previous save?" << endl;
+	std::cout << "Would you like to load a previous save?" << endl;
 	string load = getYesNo();
 	if (load == "yes") {
 		world.load(getFileName());
@@ -98,7 +190,7 @@ int main() {
 
 	system("cls");
 
-	cout << "GENERATING NEW SIMULATION" << endl;
+	std::cout << "GENERATING NEW SIMULATION" << endl;
 
 	setWidth(world);
 	setHeight(world);
@@ -109,12 +201,12 @@ int main() {
 
 execute:
 	world.generate();
-	cout << "Would you like to watch?" << endl;
+	std::cout << "Would you like to watch?" << endl;
 	string watching = getYesNo();
 
 	string autoPlay = "no";
 	if (watching == "yes") {
-		cout << "Would you like to autoplay?" << endl;
+		std::cout << "Would you like to autoplay?" << endl;
 		autoPlay = getYesNo();
 	}
 	
@@ -124,6 +216,8 @@ execute:
 		std::system("cls");
 		std::cout << output;
 	}
+
+	int initSeed = world.getSeed();
 
 	while (not world.found()) {
 		if (load == "no") {
@@ -163,6 +257,7 @@ extend:
 
 		if (world.found()) {
 			std::cout << "PATTERN FOUND AT GENERATION " << world.getGen() << endl;
+			std::cout << "Found after " << world.getSeed() - initSeed << " experiments." << endl;
 		}
 		else {
 			std::cout << "NO PATTERN FOUND" << endl;

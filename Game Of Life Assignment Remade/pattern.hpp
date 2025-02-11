@@ -60,8 +60,8 @@ namespace Patterns {
 			return *this;
 		}
 
-		int getMinX() { return minX; }
-		int getMinY() { return minY; }
+		virtual int getMinX() { return minX; }
+		virtual int getMinY() { return minY; }
 
 		int size = 0;
 	protected:
@@ -87,6 +87,13 @@ namespace Patterns {
 			nodes = other.nodes;
 		}
 
+		int getMinX() override {
+			return minX;
+		}
+
+		int getMinY() override {
+			return minY;
+		}
 		void setPeriod(int period) { this->period = period; }
 		int getPeriod() { return period; }
 

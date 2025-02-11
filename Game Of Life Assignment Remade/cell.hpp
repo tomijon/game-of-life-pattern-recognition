@@ -174,25 +174,32 @@ namespace GameOfLife {
 
 		string toString() {
 			string output;
+			int index = 0;
+			int width = getWidth();
+			int height = getHeight();
+
+			output.resize((((2 * width) + 2) * height) + 1);
 			for (int y = lowY; y < highY; y++) {
 				for (int x = lowX; x < highX; x++) {
-					output += ".";
+					//output[index++] = '.';
 					if (not cellExists({ x, y })) {
-						output += " ";
+						output[index++] = ' ';
 						continue;
 					}
 
 					Cell* cell = cells[{x, y}];
 					//if (cell->isAlive()) output += to_string(cell->getSection());
 					//else output += " ";
-					if (cell->isAlive()) output += "O";
-					else output += " ";
+					if (cell->isAlive()) output[index++] = '#';
+					else output[index++] = ' ';
 
 					//else if (cell->isDead()) cout << ".";
 					//else cout << "I";
 				}
-				output += ".\n";
+				//output[index++] = '.';
+				output[index++] = '\n';
 			}
+			output[index] = '\0';
 			return output;
 		}
 
@@ -229,7 +236,9 @@ namespace GameOfLife {
 			}
 		}
 
+		bool hasHistory() { return history.size() > 0; }
 		void addToHistory(vector<Patterns::Region> regions);
+		void checkHistory(vector<Patterns::Region> regions);
 
 		vector<Patterns::Region> makeRegions();
 		vector<Patterns::Region> makeSections();
@@ -307,7 +316,6 @@ namespace GameOfLife {
 			}
 		}
 
-		void checkHistory(vector<Patterns::Region> regions);
 
 	};
 }
